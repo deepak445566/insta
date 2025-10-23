@@ -10,25 +10,41 @@ const UserLogin = () => {
     password: "",
   });
 
+  const [loading, setLoading] = useState(false);
+
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
+    
     try {
-      const res = await API.post("/user/login", formData);
+      console.log("🟡 Attempting login...");
+      const res = await API.post("/user/login", formData, {
+        withCredentials: true // ✅ Important for cookies
+      });
 
       console.log("✅ Login success:", res.data);
 
+      // ✅ Store token in localStorage (backup)
       if (res.data.token) {
         localStorage.setItem("token", res.data.token);
+        console.log("🟢 Token stored in localStorage");
       }
 
-      navigate("/");
+      // ✅ Check if cookies are working
+      setTimeout(() => {
+        console.log("🟢 Redirecting to home...");
+        navigate("/");
+      }, 1000);
+
     } catch (err) {
       console.error("❌ Login failed:", err.response?.data || err.message);
       alert("Invalid email or password!");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -82,9 +98,10 @@ const UserLogin = () => {
 
           <button
             type="submit"
-            className="w-full bg-indigo-600 text-white py-2 rounded-lg hover:bg-indigo-700 transition"
+            disabled={loading}
+            className="w-full bg-indigo-600 text-white py-2 rounded-lg hover:bg-indigo-700 disabled:bg-gray-400 transition"
           >
-            Login
+            {loading ? "Logging in..." : "Login"}
           </button>
 
           <p className="text-center text-gray-600 mt-4">
