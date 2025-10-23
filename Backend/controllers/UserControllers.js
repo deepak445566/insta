@@ -40,6 +40,7 @@ export const registerUser = async (req, res) => {
         email: user.email,
         fullName: user.fullName,
       },
+      token: token 
     });
   } catch (error) {
     console.log(error.message);
@@ -80,6 +81,7 @@ export const loginUser = async (req, res) => {
         email: user.email,
         fullName: user.fullName,
       },
+      token: token 
     });
   } catch (error) {
     console.log(error.message);

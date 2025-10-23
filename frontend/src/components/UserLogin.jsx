@@ -22,27 +22,32 @@ const UserLogin = () => {
     
     try {
       console.log("🟡 Attempting login...");
+      
       const res = await API.post("/user/login", formData, {
-        withCredentials: true // ✅ Important for cookies
+        withCredentials: true
       });
 
       console.log("✅ Login success:", res.data);
 
-      // ✅ Store token in localStorage (backup)
+      // ✅ STORE TOKEN IN LOCALSTORAGE from response
       if (res.data.token) {
         localStorage.setItem("token", res.data.token);
-        console.log("🟢 Token stored in localStorage");
+        console.log("🟢 Token stored in localStorage:", res.data.token);
       }
 
-      // ✅ Check if cookies are working
-      setTimeout(() => {
-        console.log("🟢 Redirecting to home...");
-        navigate("/");
-      }, 1000);
+      // ✅ STORE USER DATA
+      if (res.data.user) {
+        localStorage.setItem("user", JSON.stringify(res.data.user));
+        console.log("🟢 User data stored");
+      }
+
+      // ✅ Redirect to home
+      console.log("🟢 Redirecting to home...");
+      navigate("/", { replace: true });
 
     } catch (err) {
       console.error("❌ Login failed:", err.response?.data || err.message);
-      alert("Invalid email or password!");
+      alert(err.response?.data?.message || "Invalid email or password!");
     } finally {
       setLoading(false);
     }

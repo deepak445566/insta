@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import API from "./utils/axiosConfig";
 import { FaHeart, FaRegHeart, FaCommentDots, FaBookmark, FaRegBookmark, FaHome, FaSave } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-import CommentModal from "./CommentModal";
+
 
 const Home = () => {
   const [videos, setVideos] = useState([]);
@@ -18,73 +18,41 @@ const Home = () => {
   const navigate = useNavigate();
 
   // First check authentication, then fetch videos
-  useEffect(() => {
-    const checkAuthentication = async () => {
-      try {
-        console.log("🟡 Checking authentication...");
+ // Home component ke authentication check mein
+useEffect(() => {
+  const checkAuthentication = async () => {
+    try {
+      console.log("🟡 Checking authentication...");
+      
+      // Check token from localStorage
+      const token = localStorage.getItem("token");
+      console.log("🟡 Token from localStorage:", token);
+      
+      if (!token) {
+        console.log("❌ No token found in localStorage");
         
-        // Check if token exists
-        const token = localStorage.getItem("token");
-        console.log("🟡 Token from localStorage:", token);
-        
-        if (!token) {
-          console.log("❌ No token found, redirecting to login");
-          navigate("/user/login");
-          return;
+        // Check if we have user data (maybe token expired but user exists)
+        const userData = localStorage.getItem("user");
+        if (userData) {
+          console.log("🟡 User data found but no token, redirecting to login");
         }
-
-        console.log("🟡 Token found, proceeding to fetch videos...");
-        setAuthChecked(true);
-        fetchVideos();
         
-      } catch (error) {
-        console.error("❌ Auth check error:", error);
         navigate("/user/login");
+        return;
       }
-    };
 
-    const fetchVideos = async () => {
-      try {
-        setLoading(true);
-        console.log("🟡 Fetching videos...");
-        
-        const { data } = await API.get("/item/user");
-        console.log("🟢 Videos API response:", data);
-        
-        const videosWithLikes = (data.foodItem || []).map(video => ({
-          ...video,
-          likeCount: video.likeCount || 0,
-          savesCount: video.savesCount || 0,
-          commentCount: video.commentCount || 0
-        }));
+      console.log("🟡 Token found, proceeding to fetch videos...");
+      setAuthChecked(true);
+      fetchVideos();
+      
+    } catch (error) {
+      console.error("❌ Auth check error:", error);
+      navigate("/user/login");
+    }
+  };
 
-        setVideos(videosWithLikes);
-
-        const initialLiked = {};
-        const initialSaved = {};
-        videosWithLikes.forEach(video => {
-          initialLiked[video._id] = video.isLiked || false;
-          initialSaved[video._id] = video.isSaved || false;
-        });
-        setLiked(initialLiked);
-        setSaved(initialSaved);
-
-      } catch (err) {
-        console.error("❌ Error fetching videos:", err);
-        console.error("❌ Error details:", err.response?.data);
-        
-        if (err.response?.status === 401) {
-          console.log("❌ 401 Unauthorized - Clearing token and redirecting");
-          localStorage.removeItem("token");
-          navigate("/user/login");
-        }
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    checkAuthentication();
-  }, [navigate]);
+  checkAuthentication();
+}, [navigate]);
 
   // Autoplay videos
   useEffect(() => {
@@ -271,13 +239,7 @@ const Home = () => {
         )}
       </div>
 
-      {/* Comment Modal */}
-      <CommentModal 
-        isOpen={commentModalOpen}
-        onClose={() => setCommentModalOpen(false)}
-        video={selectedVideo}
-        onCommentAdded={updateCommentCount}
-      />
+    
     </div>
   );
 };
