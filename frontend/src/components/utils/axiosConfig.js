@@ -2,7 +2,7 @@
 import axios from 'axios';
 
 const API = axios.create({
-  baseURL: 'http://localhost:3000/api',
+  baseURL: 'https://insta-1-xf3q.onrender.com/api',
   withCredentials: true,
 });
 
