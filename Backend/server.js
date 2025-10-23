@@ -15,7 +15,7 @@ const app = express();
 
 await connectDB();
 app.use(cors({
-  origin:"http://localhost:5173",
+  origin:"https://fascinating-travesseiro-d839b8.netlify.app",
   credentials:true
 }));
 app.use(cookieParser());
