@@ -7,6 +7,8 @@ export default defineConfig({
   plugins: [react(),   tailwindcss(),],
    build: {
     rollupOptions: {
-      external: ['fs', 'path', 'dotenv', 'express', 'cloudinary', 'mongoose']
-    }}
+      external: [],
+    },
+  },
+  
 })
